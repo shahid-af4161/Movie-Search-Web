@@ -10,10 +10,7 @@ const movieContainer = document.querySelector("#movie-cards");
 //     poster: "images/img.jpg"
 // };
 
-
-btn.addEventListener("click", async () => {
-
-
+async function searchMovie() {
     console.log("btn clicked");
     if (input.value.trim() === "") {
         alert("Enter movie name");
@@ -21,8 +18,13 @@ btn.addEventListener("click", async () => {
         console.log(`Searching for: ${input.value}`);
     }
 
-   let movie = await getMovie(input.value);
-    
+    let movie = await getMovie(input.value);
+    if (movie.Response === 'False') {
+        movieContainer.innerHTML = `<h3>${movie.Error}</h3>`;
+        console.log(movie);
+        return;
+    }
+
     let movieCard = document.createElement("div");
     let poster = document.createElement("img");
     let title = document.createElement("h3");
@@ -41,19 +43,26 @@ btn.addEventListener("click", async () => {
     movieCard.appendChild(title);
     movieCard.appendChild(releaseYear);
     movieCard.appendChild(rating);
+}
+btn.addEventListener("click", searchMovie);
+
+input.addEventListener("keydown", (event) => {
+    //    console.log(event.key);
+    if (event.key == 'Enter') {
+        searchMovie();
+    }
+})
 
 
-});
 
-   
-  async function getMovie(movieName) {
-   let url = `https://www.omdbapi.com/?apikey=4c3cd847&t=${movieName}`;
-    try{
+async function getMovie(movieName) {
+    let url = `https://www.omdbapi.com/?apikey=4c3cd847&t=${movieName}`;
+    try {
         let response = await axios.get(url);
         console.log(response.data);
         return response.data;
-    } catch (e){
-        console.log("Invalid Request ",e);
+    } catch (e) {
+        console.log("Invalid Request ", e);
     }
 
 }
