@@ -1,3 +1,11 @@
+body::before{
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    box-shadow: inset 0 0 150px rgba(0,0,0,0.9);
+}
+
 *{
     margin: 0;
     padding: 0;
@@ -12,8 +20,8 @@ body{
     color: #ffffff;
     background-image:
         linear-gradient(
-            rgba(0,0,0,0.8),
-            rgba(0,0,0,0.8)
+            rgba(0,0,0,0.6),
+            rgba(0,0,0,0.6)
         ),
         url("images/bg-page.png");
 
@@ -23,6 +31,8 @@ body{
 }
 
 #title{
+    background: rgba(0,0,0,0.4);
+     box-shadow: 0 0 30px rgba(0,0,0,0.8);
     color: #f5c518;
     font-family: "Montserrat", sans-serif;
      font-weight: 700;
@@ -37,6 +47,8 @@ body{
     justify-content: center;
     gap: 10px;
     margin-bottom: 30px;
+    background: rgba(0,0,0,0.4);
+    box-shadow: 0 0 30px rgba(0,0,0,0.8);
 }
 
 #search-input{
@@ -146,4 +158,46 @@ body{
 .plot{
     margin-top: 15px;
     max-width: 600px;
+}
+
+@media (max-width: 600px){
+
+    .movie-card{
+        width: 80%;
+        max-width: 300px;
+    }
+
+    .movie-card img{
+        width: 100%;
+        height: auto;
+    }
+    #title{
+        font-size: 2.5rem;
+    }
+    
+    #search-btn{
+        width: 50px;
+        height: 50px;
+        font-size: 0; /* hide text */
+        background-image: url("images/upscaled_search-btn.jpg");
+        background-size: 50px;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    #movie-details{
+        flex-direction: column;
+        align-items: center;
+        text-align: left;
+    }
+
+    #movie-details img{
+        width: 250px;
+        max-width: 100%;
+    }
+
+    .movie-info{
+        width: 100%;
+        padding: 0 15px;
+    }
 }
