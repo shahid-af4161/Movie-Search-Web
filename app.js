@@ -1,6 +1,7 @@
 const btn = document.querySelector("#search-btn");
 const input = document.querySelector("#search-input");
 const movieContainer = document.querySelector("#movie-cards");
+const movieDetails = document.querySelector("#movie-details");
 
 
 // let movie = {
@@ -10,9 +11,20 @@ const movieContainer = document.querySelector("#movie-cards");
 //     poster: "images/img.jpg"
 // };
 
+btn.addEventListener("click", searchMovie);
+
+input.addEventListener("keydown", (event) => {
+    //    console.log(event.key);
+    if (event.key == 'Enter') {
+        searchMovie();
+    }
+});
+
+
+
 async function searchMovie() {
     movieContainer.innerHTML = "";
-    console.log("btn clicked");
+
     if (input.value.trim() === "") {
         alert("Enter movie name");
         return;
@@ -20,7 +32,7 @@ async function searchMovie() {
         console.log(`Searching for: ${input.value}`);
     }
 
-    let movieFetch = await getMovie(input.value);
+    let movieFetch = await getMovie(input.value);  // object that has movie list in array(Search)
     console.log(movieFetch);
     if (movieFetch.Response === 'False') {
         movieContainer.innerHTML = `<h3>${movieFetch.Error}</h3>`;
@@ -28,14 +40,17 @@ async function searchMovie() {
         return;
     }
      
-    let movieList = movieFetch.Search;
+    let movieList = movieFetch.Search;  
     console.log(movieList);
     movieList.forEach(movie => {
         // console.log(movie);
         createMovieCard(movie);
     });
 
+    
 }
+
+
 function createMovieCard(movie) {
     let movieCard = document.createElement("div");
     let poster = document.createElement("img");
@@ -45,7 +60,12 @@ function createMovieCard(movie) {
     let rating = document.createElement("p");
 
 
-    poster.src = movie.Poster;
+   
+    if(movie.poster === "N/A"){
+         poster.src = "images/Poster-NA.png";
+    } else{
+           poster.src = movie.Poster;
+    }
     title.innerText = movie.Title;
     releaseYear.innerText = movie.Year;
     type.innerText = `Type : ${movie.Type}`;
@@ -59,23 +79,31 @@ function createMovieCard(movie) {
     movieCard.appendChild(type);
     // movieCard.appendChild(rating);
 
-    movieCard.addEventListener("click",()=>{
-    console.log(movie.imdbID);
+    movieCard.addEventListener("click",async ()=>{
+    let details = await getMovieDetails(movie.imdbID); // detailed object
+    // console.log(details);
+    movieDetails.innerHTML = `
+    <img src="${details.Poster}" alt="${details.Title}">
+    <div class="movie-info">
+        <h2>${details.Title}</h2>
+
+        <p><strong>IMDb:</strong> ${details.imdbRating}</p>
+        <p><strong>Genre:</strong> ${details.Genre}</p>
+        <p><strong>Director:</strong> ${details.Director}</p>
+        <p><strong>Actors:</strong> ${details.Actors}</p>
+        <p><strong>Box Office:</strong> ${details.BoxOffice}</p>
+
+        <p class="plot">
+            <strong>Plot:</strong> ${details.Plot}
+        </p>
+        <p><strong>Awards :</strong> ${details.Awards}</p>
+    </div>
+                             `;
+    movieDetails.scrollIntoView({
+        behavior: "smooth"
+    })
     });
 }
-
-btn.addEventListener("click", searchMovie);
-
-input.addEventListener("keydown", (event) => {
-    //    console.log(event.key);
-    if (event.key == 'Enter') {
-        searchMovie();
-    }
-});
-
-
-
-
 
 
 async function getMovie(movieName) {
@@ -91,4 +119,17 @@ async function getMovie(movieName) {
     } catch (e) {
         console.log("Invalid Request ", e);
     }
+}
+
+async function getMovieDetails(imdbID) {
+    try{
+    let url = `https://www.omdbapi.com/?apikey=4c3cd847&i=${imdbID}`
+    let response = await axios.get(url);
+    console.log(response.data);
+    return response.data;
+    
+    } catch(error){
+        console.log("Details not found.", error);
+    }
+
 }
