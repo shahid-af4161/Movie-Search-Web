@@ -81,12 +81,32 @@ body{
     gap: 20px;
      flex-wrap: wrap; /*cards move to the next line when needed. */
      justify-content: center;
-    max-width: 1000px;
+    max-width: 1300px;
     margin: 0 auto;
     min-height: 300px;
     padding: 20px;
     /* border: 2px solid black; */
 }
+
+#featured-movies{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.section-title{
+    font-family: "Poppins", sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #f5c518;
+    text-align: left;
+    margin: 40px 0 20px;
+}
+
 
 .movie-card{
     width: 220px;

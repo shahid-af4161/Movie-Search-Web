@@ -1,6 +1,7 @@
 const btn = document.querySelector("#search-btn");
 const input = document.querySelector("#search-input");
 const movieContainer = document.querySelector("#movie-cards");
+const featuredContainer = document.querySelector("#featured-movies")
 const movieDetails = document.querySelector("#movie-details");
 
 
@@ -10,6 +11,35 @@ const movieDetails = document.querySelector("#movie-details");
 //     ratings: 8.7,
 //     poster: "images/img.jpg"
 // };
+
+const featuredMovie = [
+    "Interstellar", 
+    "The Godfather", 
+    "Gladiator", 
+    "WALL·E", 
+    "Avengers: Endgame"
+];
+
+async function loadFeaturedMovies() {
+    for(let movie of featuredMovie){
+      let url = `https://www.omdbapi.com/?apikey=4c3cd847&t=${movie}`;
+      try{
+            // let response = await axios.get(url);
+            // console.log(response);
+            // let featMovie = response.data;
+            // 
+            // console.log(response);
+            let featMovie = await getMovie(movie);
+            console.log(featMovie);
+            createMovieCard(featMovie.Search[0],featuredContainer);
+      } catch(e){
+        console.log("Couldn't find featured Movie:",e);
+      }
+    }
+    
+}
+
+
 
 btn.addEventListener("click", searchMovie);
 
@@ -44,14 +74,14 @@ async function searchMovie() {
     console.log(movieList);
     movieList.forEach(movie => {
         // console.log(movie);
-        createMovieCard(movie);
+        createMovieCard(movie,movieContainer);
     });
 
     
 }
 
 
-function createMovieCard(movie) {
+function createMovieCard(movie,Container) {
     let movieCard = document.createElement("div");
     let poster = document.createElement("img");
     let title = document.createElement("h3");
@@ -61,7 +91,7 @@ function createMovieCard(movie) {
 
 
    
-    if(movie.poster === "N/A"){
+    if(movie.Poster === "N/A"){
          poster.src = "images/Poster-NA.png";
     } else{
            poster.src = movie.Poster;
@@ -72,7 +102,7 @@ function createMovieCard(movie) {
     rating.innerText = `IMDb : ${movie.imdbID}`;
     movieCard.setAttribute("class", "movie-card");
 
-    movieContainer.appendChild(movieCard);
+    Container.appendChild(movieCard);
     movieCard.appendChild(poster);
     movieCard.appendChild(title);
     movieCard.appendChild(releaseYear);
@@ -133,3 +163,4 @@ async function getMovieDetails(imdbID) {
     }
 
 }
+loadFeaturedMovies();
