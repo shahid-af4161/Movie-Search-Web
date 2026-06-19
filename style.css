@@ -1,10 +1,3 @@
-body::before{
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    box-shadow: inset 0 0 150px rgba(0,0,0,0.9);
-}
 
 *{
     margin: 0;
@@ -12,19 +5,28 @@ body::before{
     box-sizing: border-box; /* element's total width = width declared*/
 }
 
+body::before{
+    content: "";
+    position: fixed;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            rgba(0,0,0,0.7),
+            rgba(0,0,0,0.7)
+        ),
+        url("images/bg-page.png");
+    background-size: cover;
+    background-position: center;
+    z-index: -1;
+}
+
 body{
      min-height: 100vh;  /* 100% of the browser window's height */
-    padding: 40px 20px;
+    padding: 20px 20px;
     font-family: "Poppins", sans-serif;
     background-color: #121212;
     color: #ffffff;
-    background-image:
-        linear-gradient(
-            rgba(0,0,0,0.6),
-            rgba(0,0,0,0.6)
-        ),
-        url("images/bg-page.png");
-
     background-size: cover;
     background-position: center;
 
@@ -32,30 +34,31 @@ body{
 
 #title{
     background: rgba(0,0,0,0.4);
-     box-shadow: 0 0 30px rgba(0,0,0,0.8);
+     box-shadow: 0 0 10px rgba(0,0,0,0.8);
     color: #f5c518;
     font-family: "Montserrat", sans-serif;
      font-weight: 700;
     font-size: 3rem;
     letter-spacing: 2px;
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .search-sec{
     display: flex;
     justify-content: center;
     gap: 10px;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     background: rgba(0,0,0,0.4);
-    box-shadow: 0 0 30px rgba(0,0,0,0.8);
+    box-shadow: 0 0 10px rgba(0,0,0,0.8);
 }
 
 #search-input{
     background-color: #1e1e1e;
     color: #ffffff;
     border: 1px solid #333;
-    width: 350px;
+    width: 400px;
+    height: 45px;
     padding: 12px;
     border-radius: 8px;
 
@@ -87,7 +90,15 @@ body{
     padding: 20px;
     /* border: 2px solid black; */
 }
-
+#favourite-movies{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 20px;
+}
 #featured-movies{
     display: flex;
     flex-wrap: wrap;
@@ -103,13 +114,13 @@ body{
     font-size: 2rem;
     font-weight: 700;
     color: #f5c518;
-    text-align: left;
+    text-align: center;
     margin: 40px 0 20px;
 }
 
 
 .movie-card{
-    width: 220px;
+    width: 230px;
     background-color: #1e1e1e;
     border-radius: 12px;
     padding: 12px;
@@ -153,6 +164,26 @@ body{
     color: white;
 }
 
+.movie-info #fav-btn{
+    
+     background: rgba(20,20,20,0.9);
+    border-radius: 25%;
+    width: 50px;
+    font-size: 20px;
+    transition: transform 0.5s ease;
+}
+
+.movie-info #fav-btn:hover{
+    transform: scale(1.2);
+   background-color: black;
+}
+
+#movie-detail-firstline{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
 #movie-details img{
     width: 300px;
     border-radius: 20px;
@@ -180,44 +211,52 @@ body{
     max-width: 600px;
 }
 
+
 @media (max-width: 600px){
 
+    #movie-cards,
+    #featured-movies{
+        gap: 12px;
+        padding: 12px;
+    }
+
     .movie-card{
-        width: 80%;
-        max-width: 300px;
+        width: calc(45% - 6px); /* 2 cards per row, accounting for half the gap */
+        max-width: none;
     }
 
     .movie-card img{
         width: 100%;
-        height: auto;
-    }
-    #title{
-        font-size: 2.5rem;
-    }
-    
-    #search-btn{
-        width: 50px;
-        height: 50px;
-        font-size: 0; /* hide text */
-        background-image: url("images/upscaled_search-btn.jpg");
-        background-size: 50px;
-        background-repeat: no-repeat;
-        background-position: center;
+        /* height: 180px; shorter than desktop's 300px so cards don't feel oversized */
+        object-fit: cover;
     }
 
+    .movie-card h3{
+        font-size: 0.85rem;
+        min-height: 40px; /* less than desktop's 60px */
+    }
+
+    .movie-card p{
+        font-size: 0.75rem;
+    }
+
+    #title{
+        font-size: 2.2rem;
+    }
+
+    .search-sec{
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    #search-input{
+        width: 85%;
+    }
+    
     #movie-details{
         flex-direction: column;
         align-items: center;
         text-align: left;
-    }
-
-    #movie-details img{
-        width: 250px;
-        max-width: 100%;
-    }
-
-    .movie-info{
-        width: 100%;
-        padding: 0 15px;
     }
 }

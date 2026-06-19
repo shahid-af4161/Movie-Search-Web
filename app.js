@@ -1,7 +1,8 @@
 const btn = document.querySelector("#search-btn");
 const input = document.querySelector("#search-input");
 const movieContainer = document.querySelector("#movie-cards");
-const featuredContainer = document.querySelector("#featured-movies")
+const favouriteContainer = document.querySelector("#favourite-movies");
+const featuredContainer = document.querySelector("#featured-movies");
 const movieDetails = document.querySelector("#movie-details");
 
 
@@ -11,19 +12,32 @@ const movieDetails = document.querySelector("#movie-details");
 //     ratings: 8.7,
 //     poster: "images/img.jpg"
 // };
+let favMovieList = JSON.parse(localStorage.getItem("favouriteMovie")) || [];
+
+
+async function loadFavouriteMovies() {
+    favouriteContainer.innerHTML = "";
+    console.log(favMovieList);
+    favMovieList.forEach(movie => {
+        createMovieCard(movie, favouriteContainer);
+    });
+
+}
+
+
 
 const featuredMovie = [
-    "Interstellar", 
-    "The Godfather", 
-    "Gladiator", 
-    "WALL·E", 
+    "Interstellar",
+    "The Godfather",
+    "Gladiator",
+    "WALL·E",
     "Avengers: Endgame"
 ];
 
 async function loadFeaturedMovies() {
-    for(let movie of featuredMovie){
-      let url = `https://www.omdbapi.com/?apikey=4c3cd847&t=${movie}`;
-      try{
+    for (let movie of featuredMovie) {
+        let url = `https://www.omdbapi.com/?apikey=4c3cd847&t=${movie}`;
+        try {
             // let response = await axios.get(url);
             // console.log(response);
             // let featMovie = response.data;
@@ -31,14 +45,13 @@ async function loadFeaturedMovies() {
             // console.log(response);
             let featMovie = await getMovie(movie);
             console.log(featMovie);
-            createMovieCard(featMovie.Search[0],featuredContainer);
-      } catch(e){
-        console.log("Couldn't find featured Movie:",e);
-      }
+            createMovieCard(featMovie.Search[0], featuredContainer);
+        } catch (e) {
+            console.log("Couldn't find featured Movie:", e);
+        }
     }
-    
-}
 
+}
 
 
 btn.addEventListener("click", searchMovie);
@@ -47,7 +60,13 @@ input.addEventListener("keydown", (event) => {
     //    console.log(event.key);
     if (event.key == 'Enter') {
         searchMovie();
+        movieContainer.scrollIntoView({
+        behavior:"smooth"
+    });
     }
+    
+
+    
 });
 
 
@@ -69,19 +88,19 @@ async function searchMovie() {
         // console.log(movieFetch);
         return;
     }
-     
-    let movieList = movieFetch.Search;  
+
+    let movieList = movieFetch.Search;
     console.log(movieList);
     movieList.forEach(movie => {
         // console.log(movie);
-        createMovieCard(movie,movieContainer);
+        createMovieCard(movie, movieContainer);
     });
 
-    
+
 }
 
 
-function createMovieCard(movie,Container) {
+function createMovieCard(movie, Container) {
     let movieCard = document.createElement("div");
     let poster = document.createElement("img");
     let title = document.createElement("h3");
@@ -90,11 +109,11 @@ function createMovieCard(movie,Container) {
     let rating = document.createElement("p");
 
 
-   
-    if(movie.Poster === "N/A"){
-         poster.src = "images/Poster-NA.png";
-    } else{
-           poster.src = movie.Poster;
+
+    if (movie.Poster === "N/A") {
+        poster.src = "images/Poster-NA.png";
+    } else {
+        poster.src = movie.Poster;
     }
     title.innerText = movie.Title;
     releaseYear.innerText = movie.Year;
@@ -109,13 +128,16 @@ function createMovieCard(movie,Container) {
     movieCard.appendChild(type);
     // movieCard.appendChild(rating);
 
-    movieCard.addEventListener("click",async ()=>{
-    let details = await getMovieDetails(movie.imdbID); // detailed object
-    // console.log(details);
-    movieDetails.innerHTML = `
+    movieCard.addEventListener("click", async () => {
+        let details = await getMovieDetails(movie.imdbID); // detailed object
+        // console.log(details);
+
+        movieDetails.innerHTML = `
     <img src="${details.Poster}" alt="${details.Title}">
     <div class="movie-info">
+        <div id="movie-detail-firstline">
         <h2>${details.Title}</h2>
+        <button id="fav-btn">❤️</button></div>
 
         <p><strong>IMDb:</strong> ${details.imdbRating}</p>
         <p><strong>Genre:</strong> ${details.Genre}</p>
@@ -127,11 +149,58 @@ function createMovieCard(movie,Container) {
             <strong>Plot:</strong> ${details.Plot}
         </p>
         <p><strong>Awards :</strong> ${details.Awards}</p>
-    </div>
-                             `;
-    movieDetails.scrollIntoView({
-        behavior: "smooth"
-    })
+    </div>`;
+
+
+        movieDetails.scrollIntoView({
+            behavior: "smooth"
+        })
+
+let favBtn = document.querySelector("#fav-btn");
+
+// Check if movie is already in favorites
+let isFavourite = favMovieList.some(
+    movie => movie.imdbID === details.imdbID
+);
+
+favBtn.innerHTML = isFavourite ? "❤️" : "🤍";
+
+favBtn.addEventListener("click", () => {
+
+    // Check again before adding
+    let alreadyExists = favMovieList.some(
+        movie => movie.imdbID === details.imdbID
+    );
+
+    if(alreadyExists){
+        alert("Movie already in favorites");
+        return;
+    }
+
+    let favMovie = {
+        Title: details.Title,
+        Poster: details.Poster,
+        Year: details.Year,
+        Type: details.Type,
+        imdbID: details.imdbID,
+        imdbRating: details.imdbRating
+    };
+
+    favMovieList.push(favMovie);
+
+    localStorage.setItem(
+        "favouriteMovie",
+        JSON.stringify(favMovieList)
+    );
+
+    favBtn.innerHTML = "❤️";
+
+    loadFavouriteMovies(); // refresh favorites section
+
+    console.log("Added to favorites");
+    });
+
+
     });
 }
 
@@ -152,15 +221,16 @@ async function getMovie(movieName) {
 }
 
 async function getMovieDetails(imdbID) {
-    try{
-    let url = `https://www.omdbapi.com/?apikey=4c3cd847&i=${imdbID}`
-    let response = await axios.get(url);
-    console.log(response.data);
-    return response.data;
-    
-    } catch(error){
+    try {
+        let url = `https://www.omdbapi.com/?apikey=4c3cd847&i=${imdbID}`
+        let response = await axios.get(url);
+        console.log(response.data);
+        return response.data;
+
+    } catch (error) {
         console.log("Details not found.", error);
     }
 
 }
+loadFavouriteMovies();
 loadFeaturedMovies();
