@@ -173,7 +173,12 @@ favBtn.addEventListener("click", () => {
     );
 
     if(alreadyExists){
-        alert("Movie already in favorites");
+        favMovieList = favMovieList.filter(
+            movie => movie.imdbID != details.imdbID
+        );
+        localStorage.setItem("favouriteMovie",JSON.stringify(favMovieList));
+        loadFavouriteMovies();
+            favBtn.innerHTML = "🤍";
         return;
     }
 
