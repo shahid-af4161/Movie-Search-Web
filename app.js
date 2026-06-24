@@ -3,7 +3,11 @@ const input = document.querySelector("#search-input");
 const movieContainer = document.querySelector("#movie-cards");
 const favouriteContainer = document.querySelector("#favourite-movies");
 const featuredContainer = document.querySelector("#featured-movies");
+const favSection = document.querySelector("#favourite-section");
+const featSection = document.querySelector("#featured-section");
 const movieDetails = document.querySelector("#movie-details");
+const loaderSpinner = document.querySelector("#loader");
+const searchTitle = document.querySelector(".search-title");
 
 
 // let movie = {
@@ -53,50 +57,63 @@ async function loadFeaturedMovies() {
 
 }
 
+function hideContainer(cont1, cont2) {
+    console.log(cont1);
+    console.log(cont2);
 
-btn.addEventListener("click", searchMovie);
+    cont1.classList.add("hide-element");
+    cont2.classList.add("hide-element");
+}
 
-input.addEventListener("keydown", (event) => {
+async function handleSearch() {
+    loaderSpinner.classList.remove("hide-element");
+        await new Promise(resolve =>
+            setTimeout(resolve, 500)
+        );
+       let success= await searchMovie();
+        if(success){
+            searchTitle.classList.remove("hide-element");
+            hideContainer(favSection, featSection);
+        }
+        loaderSpinner.classList.add("hide-element");
+
+}
+
+btn.addEventListener("click", handleSearch);
+
+input.addEventListener("keydown", async (event) => {
     //    console.log(event.key);
     if (event.key == 'Enter') {
-        searchMovie();
-        movieContainer.scrollIntoView({
-        behavior:"smooth"
-    });
+        handleSearch();
     }
-    
-
-    
 });
-
 
 
 async function searchMovie() {
     movieContainer.innerHTML = "";
-
     if (input.value.trim() === "") {
         alert("Enter movie name");
-        return;
+        return false;
     } else {
         console.log(`Searching for: ${input.value}`);
     }
 
     let movieFetch = await getMovie(input.value);  // object that has movie list in array(Search)
-    console.log(movieFetch);
+    // console.log(movieFetch);
     if (movieFetch.Response === 'False') {
         movieContainer.innerHTML = `<h3>${movieFetch.Error}</h3>`;
         // console.log(movieFetch);
-        return;
-    }
+        return false;
+    } 
 
     let movieList = movieFetch.Search;
-    console.log(movieList);
+    // console.log(movieList);
     movieList.forEach(movie => {
         // console.log(movie);
         createMovieCard(movie, movieContainer);
     });
 
-
+    return true;
 }
 
 
@@ -156,54 +173,54 @@ function createMovieCard(movie, Container) {
             behavior: "smooth"
         })
 
-let favBtn = document.querySelector("#fav-btn");
+        let favBtn = document.querySelector("#fav-btn");
 
-// Check if movie is already in favorites
-let isFavourite = favMovieList.some(
-    movie => movie.imdbID === details.imdbID
-);
-
-favBtn.innerHTML = isFavourite ? "❤️" : "🤍";
-
-favBtn.addEventListener("click", () => {
-
-    // Check again before adding
-    let alreadyExists = favMovieList.some(
-        movie => movie.imdbID === details.imdbID
-    );
-
-    if(alreadyExists){
-        favMovieList = favMovieList.filter(
-            movie => movie.imdbID != details.imdbID
+        // Check if movie is already in favorites
+        let isFavourite = favMovieList.some(
+            movie => movie.imdbID === details.imdbID
         );
-        localStorage.setItem("favouriteMovie",JSON.stringify(favMovieList));
-        loadFavouriteMovies();
-            favBtn.innerHTML = "🤍";
-        return;
-    }
 
-    let favMovie = {
-        Title: details.Title,
-        Poster: details.Poster,
-        Year: details.Year,
-        Type: details.Type,
-        imdbID: details.imdbID,
-        imdbRating: details.imdbRating
-    };
+        favBtn.innerHTML = isFavourite ? "❤️" : "🤍";
 
-    favMovieList.push(favMovie);
+        favBtn.addEventListener("click", () => {
 
-    localStorage.setItem(
-        "favouriteMovie",
-        JSON.stringify(favMovieList)
-    );
+            // Check again before adding
+            let alreadyExists = favMovieList.some(
+                movie => movie.imdbID === details.imdbID
+            );
 
-    favBtn.innerHTML = "❤️";
+            if (alreadyExists) {
+                favMovieList = favMovieList.filter(
+                    movie => movie.imdbID != details.imdbID
+                );
+                localStorage.setItem("favouriteMovie", JSON.stringify(favMovieList));
+                loadFavouriteMovies();
+                favBtn.innerHTML = "🤍";
+                return;
+            }
 
-    loadFavouriteMovies(); // refresh favorites section
+            let favMovie = {
+                Title: details.Title,
+                Poster: details.Poster,
+                Year: details.Year,
+                Type: details.Type,
+                imdbID: details.imdbID,
+                imdbRating: details.imdbRating
+            };
 
-    console.log("Added to favorites");
-    });
+            favMovieList.push(favMovie);
+
+            localStorage.setItem(
+                "favouriteMovie",
+                JSON.stringify(favMovieList)
+            );
+
+            favBtn.innerHTML = "❤️";
+
+            loadFavouriteMovies(); // refresh favorites section
+
+            console.log("Added to favorites");
+        });
 
 
     });
